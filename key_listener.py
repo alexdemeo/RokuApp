@@ -14,10 +14,10 @@ class KeyListener:
 
         print("Key mappings are:")
         for key in self.key_map:
-            print("\t" + self.__format_mapping(key))
+            print("\t" + self.format_mapping(key))
         print()
 
-    def __format_mapping(self, btn):
+    def format_mapping(self, btn):
         return btn + " –> " + self.key_map[btn]
 
     def toggle_enabled(self):

@@ -1,4 +1,4 @@
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import QKeySequence, QIcon
 from PyQt5.QtWidgets import *
 
@@ -8,7 +8,7 @@ MARGIN = 5
 class Remote(QMainWindow):
 
     def __init__(self, listener, roku, title, width, height):
-        super().__init__(None)
+        super(Remote, self).__init__(None)
         self.listener = listener
         self.roku = roku
         self.__init_ui(title, width, height)
@@ -23,7 +23,7 @@ class Remote(QMainWindow):
         btn_pwr = QPushButton('🔌')
         btn_vol_down = QPushButton('−')
         btn_vol_up = QPushButton('＋')
-        btn_back = QPushButton('←')
+        btn_back = QPushButton('↲')
         btn_home = QPushButton('⌂')
         btn_arrow_down = QPushButton('↓')
         btn_arrow_up = QPushButton('↑')
@@ -44,25 +44,26 @@ class Remote(QMainWindow):
 
         btn_mute.clicked.connect(lambda: self.roku.cmd('Mute'))
         btn_pwr.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_vol_down.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_vol_up.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_back.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_home.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_arrow_down.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_arrow_up.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_arrow_left.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_arrow_right.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_ok.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_replay.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_no_disturb.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_rew.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_fwd.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_netflix.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_hulu.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_showtime.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_youtube.clicked.connect(lambda: self.roku.cmd('Power'))
+        btn_vol_down.clicked.connect(lambda: self.roku.cmd('VolumeDown'))
+        btn_vol_up.clicked.connect(lambda: self.roku.cmd('VolumeUp'))
+        btn_back.clicked.connect(lambda: self.roku.cmd('Back'))
+        btn_home.clicked.connect(lambda: self.roku.cmd('Home'))
+        btn_arrow_down.clicked.connect(lambda: self.roku.cmd('Down'))
+        btn_arrow_up.clicked.connect(lambda: self.roku.cmd('Up'))
+        btn_arrow_left.clicked.connect(lambda: self.roku.cmd('Left'))
+        btn_arrow_right.clicked.connect(lambda: self.roku.cmd('Right'))
+        btn_ok.clicked.connect(lambda: self.roku.cmd('Select'))
+        btn_replay.clicked.connect(lambda: self.roku.cmd('?'))
+        btn_no_disturb.clicked.connect(lambda: self.roku.cmd('?'))
+        btn_details.clicked.connect(lambda: self.roku.cmd('Info'))
+        btn_rew.clicked.connect(lambda: self.roku.cmd('Rew'))
+        btn_fwd.clicked.connect(lambda: self.roku.cmd('Fwd'))
+        btn_netflix.clicked.connect(lambda: self.roku.cmd('?'))
+        btn_hulu.clicked.connect(lambda: self.roku.cmd('?'))
+        btn_showtime.clicked.connect(lambda: self.roku.cmd('?'))
+        btn_youtube.clicked.connect(lambda: self.roku.cmd('?'))
 
-        checkbox_enable_keyboard.stateChanged.connect(self.listener.toggle_enabled)
+        checkbox_enable_keyboard.stateChanged.connect(self.toggle_keyboard)
 
         layout.addWidget(btn_mute, 0, 0)
         layout.addWidget(btn_pwr, 0, 2)
@@ -88,13 +89,23 @@ class Remote(QMainWindow):
 
         layout.addWidget(checkbox_enable_keyboard, 0, 1)
 
+        qApp.installEventFilter(self)
+
+    def toggle_keyboard(self):
+        self.listener.toggle_enabled()
+        self.centralWidget().clearFocus()
+
     def create_grid_layout(self, layout):
         w = QWidget(self)
         self.setCentralWidget(w)
-        # layout.setColumnStretch()
         w.setLayout(layout)
 
-    def keyPressEvent(self, event):
-        key_str = QKeySequence(event.key()).toString()
-        if self.listener.on_press(key_str):
-            self.statusBar().showMessage(self.listener.format_mapping(key_str))
+    def eventFilter(self, source, event):
+        if not self.listener.enabled:
+            return False
+        if event.type() == QtCore.QEvent.KeyPress:
+            key_str = QKeySequence(event.key()).toString()
+            if self.listener.on_press(key_str):
+                self.statusBar().showMessage(self.listener.format_mapping(key_str))
+                return True
+        return super(Remote, self).eventFilter(source, event)
