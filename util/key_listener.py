@@ -1,4 +1,4 @@
-from constants import DEFAULT_KEYBOARD_ENABLED
+from util.constants import DEFAULT_KEYBOARD_ENABLED
 
 
 class KeyListener:

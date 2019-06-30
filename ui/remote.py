@@ -1,14 +1,12 @@
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtGui import QKeySequence, QIcon
+from PyQt5 import QtCore
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import *
-
-MARGIN = 5
 
 
 class Remote(QMainWindow):
 
-    def __init__(self, listener, roku, title, width, height):
-        super(Remote, self).__init__(None)
+    def __init__(self, listener, roku, title, width, height, flags, *args, **kwargs):
+        super().__init__(flags, *args, **kwargs)
         self.listener = listener
         self.roku = roku
         self.__init_ui(title, width, height)
@@ -40,6 +38,7 @@ class Remote(QMainWindow):
         btn_hulu = QPushButton('Hulu')
         btn_showtime = QPushButton('Showtime')
         btn_youtube = QPushButton('YouTube')
+        btn_settings = QPushButton('⚙')
         checkbox_enable_keyboard = QCheckBox('Enable keyboard')
 
         btn_mute.clicked.connect(lambda: self.roku.cmd('Mute'))
@@ -62,7 +61,7 @@ class Remote(QMainWindow):
         btn_hulu.clicked.connect(lambda: self.roku.cmd('?'))
         btn_showtime.clicked.connect(lambda: self.roku.cmd('?'))
         btn_youtube.clicked.connect(lambda: self.roku.cmd('?'))
-
+        btn_settings.clicked.connect(lambda: self.display_settings)
         checkbox_enable_keyboard.stateChanged.connect(self.toggle_keyboard)
 
         layout.addWidget(btn_mute, 0, 0)
@@ -86,10 +85,14 @@ class Remote(QMainWindow):
         layout.addWidget(btn_hulu, 8, 2)
         layout.addWidget(btn_showtime, 9, 0)
         layout.addWidget(btn_youtube, 9, 2)
-
+        layout.addWidget(btn_settings, 10, 1)
         layout.addWidget(checkbox_enable_keyboard, 0, 1)
 
+        # self.setFixedSize(self.size())
         qApp.installEventFilter(self)
+
+    def display_settings(self):
+        pass
 
     def toggle_keyboard(self):
         self.listener.toggle_enabled()
