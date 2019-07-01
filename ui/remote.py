@@ -2,14 +2,16 @@ from PyQt5 import QtCore
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import *
 
+from ui.settings_panel import SettingsPanel
+
 
 class Remote(QMainWindow):
 
-    def __init__(self, listener, roku, title, width, height, flags, *args, **kwargs):
-        super().__init__(flags, *args, **kwargs)
-        self.listener = listener
+    def __init__(self, roku, title, width, height):
+        super().__init__(None)
         self.roku = roku
         self.__init_ui(title, width, height)
+        self.settings_panel = SettingsPanel(roku.settings)
 
     def __init_ui(self, title, min_width, min_height):
         self.setMinimumSize(min_width, min_height)
@@ -41,27 +43,28 @@ class Remote(QMainWindow):
         btn_settings = QPushButton('⚙')
         checkbox_enable_keyboard = QCheckBox('Enable keyboard')
 
-        btn_mute.clicked.connect(lambda: self.roku.cmd('Mute'))
-        btn_pwr.clicked.connect(lambda: self.roku.cmd('Power'))
-        btn_vol_down.clicked.connect(lambda: self.roku.cmd('VolumeDown'))
-        btn_vol_up.clicked.connect(lambda: self.roku.cmd('VolumeUp'))
-        btn_back.clicked.connect(lambda: self.roku.cmd('Back'))
-        btn_home.clicked.connect(lambda: self.roku.cmd('Home'))
-        btn_arrow_down.clicked.connect(lambda: self.roku.cmd('Down'))
-        btn_arrow_up.clicked.connect(lambda: self.roku.cmd('Up'))
-        btn_arrow_left.clicked.connect(lambda: self.roku.cmd('Left'))
-        btn_arrow_right.clicked.connect(lambda: self.roku.cmd('Right'))
-        btn_ok.clicked.connect(lambda: self.roku.cmd('Select'))
-        btn_replay.clicked.connect(lambda: self.roku.cmd('?'))
-        btn_no_disturb.clicked.connect(lambda: self.roku.cmd('?'))
-        btn_details.clicked.connect(lambda: self.roku.cmd('Info'))
-        btn_rew.clicked.connect(lambda: self.roku.cmd('Rew'))
-        btn_fwd.clicked.connect(lambda: self.roku.cmd('Fwd'))
-        btn_netflix.clicked.connect(lambda: self.roku.cmd('?'))
-        btn_hulu.clicked.connect(lambda: self.roku.cmd('?'))
-        btn_showtime.clicked.connect(lambda: self.roku.cmd('?'))
-        btn_youtube.clicked.connect(lambda: self.roku.cmd('?'))
-        btn_settings.clicked.connect(lambda: self.display_settings)
+        btn_mute.clicked.connect(lambda: self.roku.cmd_keypress('VolumeMute'))
+        btn_pwr.clicked.connect(lambda: self.roku.cmd_keypress('Power'))
+        btn_vol_down.clicked.connect(lambda: self.roku.cmd_keypress('VolumeDown'))
+        btn_vol_up.clicked.connect(lambda: self.roku.cmd_keypress('VolumeUp'))
+        btn_back.clicked.connect(lambda: self.roku.cmd_keypress('Back'))
+        btn_home.clicked.connect(lambda: self.roku.cmd_keypress('Home'))
+        btn_arrow_down.clicked.connect(lambda: self.roku.cmd_keypress('Down'))
+        btn_arrow_up.clicked.connect(lambda: self.roku.cmd_keypress('Up'))
+        btn_arrow_left.clicked.connect(lambda: self.roku.cmd_keypress('Left'))
+        btn_arrow_right.clicked.connect(lambda: self.roku.cmd_keypress('Right'))
+        btn_ok.clicked.connect(lambda: self.roku.cmd_keypress('Select'))
+        btn_replay.clicked.connect(lambda: self.roku.cmd_keypress('InstantReplay'))
+        btn_no_disturb.clicked.connect(lambda: self.roku.cmd_keypress('?'))
+        btn_details.clicked.connect(lambda: self.roku.cmd_keypress('Info'))
+        btn_rew.clicked.connect(lambda: self.roku.cmd_keypress('Rew'))
+        btn_fwd.clicked.connect(lambda: self.roku.cmd_keypress('Fwd'))
+
+        btn_netflix.clicked.connect(lambda: self.roku.cmd_content('12'))
+        btn_hulu.clicked.connect(lambda: self.roku.cmd_content('2285'))
+        btn_showtime.clicked.connect(lambda: self.roku.cmd_content('8838'))
+        btn_youtube.clicked.connect(lambda: self.roku.cmd_content('837'))
+        btn_settings.clicked.connect(self.display_settings)
         checkbox_enable_keyboard.stateChanged.connect(self.toggle_keyboard)
 
         layout.addWidget(btn_mute, 0, 0)
@@ -83,8 +86,8 @@ class Remote(QMainWindow):
         layout.addWidget(btn_fwd, 7, 2)
         layout.addWidget(btn_netflix, 8, 0)
         layout.addWidget(btn_hulu, 8, 2)
-        layout.addWidget(btn_showtime, 9, 0)
-        layout.addWidget(btn_youtube, 9, 2)
+        layout.addWidget(btn_showtime, 9, 2)
+        layout.addWidget(btn_youtube, 9, 0)
         layout.addWidget(btn_settings, 10, 1)
         layout.addWidget(checkbox_enable_keyboard, 0, 1)
 
@@ -92,7 +95,7 @@ class Remote(QMainWindow):
         qApp.installEventFilter(self)
 
     def display_settings(self):
-        pass
+        self.settings_panel.show()
 
     def toggle_keyboard(self):
         self.listener.toggle_enabled()
@@ -104,11 +107,11 @@ class Remote(QMainWindow):
         w.setLayout(layout)
 
     def eventFilter(self, source, event):
-        if not self.listener.enabled:
+        if not self.roku.key_listener.enabled:
             return False
         if event.type() == QtCore.QEvent.KeyPress:
             key_str = QKeySequence(event.key()).toString()
-            if self.listener.on_press(key_str):
+            if self.roku.key_listener.on_press(key_str):
                 self.statusBar().showMessage(self.listener.format_mapping(key_str))
                 return True
         return super(Remote, self).eventFilter(source, event)

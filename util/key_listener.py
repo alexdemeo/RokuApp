@@ -31,7 +31,7 @@ class KeyListener:
         if btn == "Esc":
             return exit(0)
         if btn in self.key_map:
-            self.roku.cmd(self.key_map[btn])
+            self.roku.cmd_keypress(self.key_map[btn])
             return True
         else:
             print("Unrecognized key " + btn)
