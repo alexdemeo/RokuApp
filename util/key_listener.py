@@ -1,13 +1,9 @@
-from util.constants import DEFAULT_KEYBOARD_ENABLED
-
-
 class KeyListener:
     def __init__(self, cfg, roku):
         self.key_map = dict()
         self.roku = roku
-        self.enabled = DEFAULT_KEYBOARD_ENABLED
-        config = open(cfg, "r")
-        for line in config:
+        key_cfg = open(cfg, "r")
+        for line in key_cfg:
             if ":" in line:
                 parts = line.split(":")
                 self.key_map[parts[1][:-1]] = parts[0]
@@ -21,11 +17,11 @@ class KeyListener:
         return btn + " –> " + self.key_map[btn]
 
     def toggle_enabled(self):
-        self.enabled = not self.enabled
-        print('Keyboard ' + ('enabled' if self.enabled else 'disabled'))
+        self.roku.settings.toggle_keyboard_enabled()
+        print('Keyboard ' + ('enabled' if self.roku.settings.get_keyboard_enabled() else 'disabled'))
 
     def on_press(self, btn):
-        if not self.enabled:
+        if not self.roku.settings.get_keyboard_enabled():
             return False
 
         if btn == "Esc":

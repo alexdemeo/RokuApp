@@ -1,5 +1,5 @@
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QPushButton
 
 
 class SettingsPanel(QWidget):
@@ -14,11 +14,16 @@ class SettingsPanel(QWidget):
 
         text_ip = QLineEdit()
         lbl_ip = QLabel('Roku IP: ')
+        btn_done = QPushButton('Done')
 
         text_ip.setText(self.settings.get_ip())
 
+        btn_done.clicked.connect(self.close_panel)
+
         layout.addWidget(lbl_ip, 0, 0)
         layout.addWidget(text_ip, 0, 1)
+        layout.addWidget(btn_done, 1, 1)
 
-        pass
-
+    def close_panel(self):
+        self.settings.flush_to_file()
+        self.close()
