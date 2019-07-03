@@ -39,8 +39,9 @@ class Settings:
     def get_keyboard_enabled(self):
         return self.mapping['keyboard_enabled']
 
-    def toggle_keyboard_enabled(self):
-        self.mapping['keyboard_enabled'] = not self.mapping['keyboard_enabled']
+    def set_keyboard_enabled(self, flag):
+        print('Keyboard ' + 'enabled' if flag > 0 else 'disabled')
+        self.mapping['keyboard_enabled'] = True if flag > 0 else False
 
     def flush_to_file(self):
         file = open(CFG, 'w')

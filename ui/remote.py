@@ -70,7 +70,7 @@ class Remote(QMainWindow):
         self.btn_showtime.clicked.connect(lambda: self.roku.cmd_content('8838'))
         self.btn_youtube.clicked.connect(lambda: self.roku.cmd_content('837'))
         self.btn_settings.clicked.connect(lambda: self.set_display_settings(True))
-        self.checkbox_enable_keyboard.stateChanged.connect(self.toggle_keyboard)
+        self.checkbox_enable_keyboard.stateChanged.connect(lambda x: self.roku.settings.set_keyboard_enabled(x))
 
         layout.addWidget(self.btn_mute, 0, 0)
         layout.addWidget(self.btn_pwr, 0, 2)
@@ -101,10 +101,6 @@ class Remote(QMainWindow):
     def set_display_settings(self, flag):
         self.settings_panel.show() if flag else self.settings_panel.hide()
 
-    def toggle_keyboard(self):
-        self.roku.key_listener.toggle_enabled()
-        self.centralWidget().clearFocus()
-
     def create_grid_layout(self, layout):
         w = QWidget(self)
         self.setCentralWidget(w)
@@ -116,7 +112,6 @@ class Remote(QMainWindow):
         if event.type() == QtCore.QEvent.KeyPress:
             key_str = QKeySequence(event.key()).toString()
             if self.roku.key_listener.on_press(key_str):
-                # self.statusBar().showMessage(self.roku.key_listener.format_mapping(key_str))
                 return True
         return super(Remote, self).eventFilter(source, event)
 

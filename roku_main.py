@@ -12,7 +12,7 @@ class Roku:
     def __init__(self):
         self.app = QApplication(sys.argv)
         self.settings = Settings()
-        self.key_listener = KeyListener('res/key_cfg.txt', self)
+        self.key_listener = KeyListener('res/key_cfg.json', self)
         self.ui = Remote(self)
         print("Ready for IP: " + self.settings.get_ip())
 

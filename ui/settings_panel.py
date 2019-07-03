@@ -1,4 +1,5 @@
 from PyQt5 import QtCore
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QPushButton
 
 
@@ -31,3 +32,12 @@ class SettingsPanel(QWidget):
     def close_panel(self):
         self.settings.flush_to_file()
         self.close()
+
+    def eventFilter(self, source, event):
+        if not self.roku.settings.get_keyboard_enabled():
+            return False
+        if event.type() == QtCore.QEvent.KeyPress:
+            key_str = QKeySequence(event.key()).toString()
+            if key_str == 'Return':
+                return True
+        return super(SettingsPanel, self).eventFilter(source, event)
