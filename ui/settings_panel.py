@@ -19,10 +19,14 @@ class SettingsPanel(QWidget):
         text_ip.setText(self.settings.get_ip())
 
         btn_done.clicked.connect(self.close_panel)
+        text_ip.textChanged.connect(self.text_ip_edit_done)
 
         layout.addWidget(lbl_ip, 0, 0)
         layout.addWidget(text_ip, 0, 1)
         layout.addWidget(btn_done, 1, 1)
+
+    def text_ip_edit_done(self, text):
+        self.settings.set_ip(text)
 
     def close_panel(self):
         self.settings.flush_to_file()

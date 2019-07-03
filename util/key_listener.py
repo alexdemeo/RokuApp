@@ -18,7 +18,7 @@ class KeyListener:
 
     def toggle_enabled(self):
         self.roku.settings.toggle_keyboard_enabled()
-        print('Keyboard ' + ('enabled' if self.roku.settings.get_keyboard_enabled() else 'disabled'))
+        print('Keyboard enabled: ' + str(self.roku.settings.get_keyboard_enabled()))
 
     def on_press(self, btn):
         if not self.roku.settings.get_keyboard_enabled():

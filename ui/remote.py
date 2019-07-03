@@ -119,3 +119,7 @@ class Remote(QMainWindow):
                 # self.statusBar().showMessage(self.roku.key_listener.format_mapping(key_str))
                 return True
         return super(Remote, self).eventFilter(source, event)
+
+    def closeEvent(self, event):
+        self.roku.settings.flush_to_file()
+        event.accept()

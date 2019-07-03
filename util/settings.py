@@ -1,53 +1,48 @@
-import distutils
+import json
 
-CFG = 'res/config.txt'
+CFG = 'res/config.json'
+
 
 class Settings:
     def __init__(self):
-        self.mapping = self.build_map_from_file()
+        self.mapping = {}
+        file = open(CFG, 'r')
+        config = json.load(file)
+        for k, v in config.items():
+            self.mapping[k] = v
+        print(config)
 
     def get_ip(self):
-        return str(self.mapping['IP'])
+        return self.mapping['ip']
 
     def set_ip(self, ip):
-        self.mapping['IP'] = str(ip)
+        self.mapping['ip'] = str(ip)
 
     def get_title(self):
-        return str(self.mapping['TITLE'])
+        return self.mapping['title']
 
     def set_title(self, title):
-        self.mapping['TITLE'] = title
+        self.mapping['title'] = title
 
     def get_min_width(self):
-        return int(self.mapping['MIN_WIDTH'])
+        return self.mapping['min_width']
 
     def set_min_width(self, min_width):
-        self.mapping['MIN_WIDTH'] = min_width
+        self.mapping['min_width'] = min_width
 
     def get_min_height(self):
-        return int(self.mapping['MIN_HEIGHT'])
+        return int(self.mapping['min_height'])
 
     def set_min_height(self, min_height):
-        self.mapping['MIN_HEIGHT'] = min_height
+        self.mapping['min_height'] = min_height
 
     def get_keyboard_enabled(self):
-        return self.mapping['KEYBOARD_ENABLED'] == 'True'
+        return self.mapping['keyboard_enabled']
 
     def toggle_keyboard_enabled(self):
-        self.mapping['KEYBOARD_ENABLED'] = 'False' if self.mapping['KEYBOARD_ENABLED'] == 'True' else 'True'
+        self.mapping['keyboard_enabled'] = not self.mapping['keyboard_enabled']
 
     def flush_to_file(self):
         file = open(CFG, 'w')
-        for key, value in self.mapping.items():
-            file.write(key + '=' + value + '\n')
-
-    @staticmethod
-    def build_map_from_file():
-        mapping = {}
-        config = open(CFG, 'r')
-        for line in config:
-            if "=" in line:
-                parts = line.split("=")
-                mapping[parts[0]] = parts[1][:-1]
-        print(mapping)
-        return mapping
+        json.dump(self.mapping, file)
+        print('Flushed config.json to file for contents: ' + str(self.mapping))
