@@ -6,7 +6,8 @@ class KeyListener:
         self.key_map = dict()
         self.roku = roku
         key_cfg = open(cfg, "r")
-        self.key_map = json.load(key_cfg)
+        self.key_map = {v: k for k, v in json.load(key_cfg).items()}
+
         print("Key mappings are:")
         for key in self.key_map:
             print("\t" + self.format_mapping(key))
