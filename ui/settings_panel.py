@@ -34,10 +34,8 @@ class SettingsPanel(QWidget):
         self.close()
 
     def eventFilter(self, source, event):
-        if not self.roku.settings.get_keyboard_enabled():
-            return False
         if event.type() == QtCore.QEvent.KeyPress:
+            if not self.roku.settings.get_keyboard_enabled():
+                return False
             key_str = QKeySequence(event.key()).toString()
-            if key_str == 'Return':
-                return True
         return super(SettingsPanel, self).eventFilter(source, event)

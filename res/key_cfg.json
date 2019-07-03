@@ -16,5 +16,6 @@
 
   "VolumeUp" : "=",
   "VolumeDown" : "-",
-  "VolumeMute" : "0"
+  "VolumeMute" : "0",
+  "Esc" : "Exit"
 }

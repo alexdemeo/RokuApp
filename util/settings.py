@@ -1,6 +1,6 @@
 import json
 
-CFG = 'res/config.json'
+CFG = 'res/settings.json'
 
 
 class Settings:
@@ -46,4 +46,4 @@ class Settings:
     def flush_to_file(self):
         file = open(CFG, 'w')
         json.dump(self.mapping, file)
-        print('Flushed config.json to file for contents: ' + str(self.mapping))
+        print('Flushed settings.json to file for contents: ' + str(self.mapping))
