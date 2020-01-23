@@ -3,9 +3,9 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from ui.remote import Remote
-from util.key_listener import KeyListener
-from util.settings import Settings
+from src.ui.remote import Remote
+from src.util.key_listener import KeyListener
+from src.util.settings import Settings
 
 
 class Roku:
@@ -26,6 +26,7 @@ class Roku:
         subprocess.Popen(command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).communicate()
 
     def cmd_keypress(self, btn):
+        print(btn)
         command = "curl -d '' http://" + self.settings.get_ip() + ":8060/keypress/" + btn
         self.__shell(command)
 

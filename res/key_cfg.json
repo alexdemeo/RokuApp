@@ -9,8 +9,8 @@
   "Home" : "`",
   "Back" : "Backspace",
 
-  "Play" : "Space",
-  "Rew" : ",",
+  "Play" : "Tab",
+  "Rev" : ",",
   "Fwd" : ".",
   "Info" : "\\",
 
