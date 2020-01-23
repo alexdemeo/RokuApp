@@ -14,6 +14,28 @@ class Remote(QMainWindow):
         self.settings_panel = SettingsPanel(roku.settings)
         self.__init_settings()
 
+    def set_display_settings(self, flag):
+        self.settings_panel.show() if flag else self.settings_panel.hide()
+
+    def __create_grid_layout(self, layout):
+        w = QWidget(self)
+        self.setCentralWidget(w)
+        w.setLayout(layout)
+
+    def eventFilter(self, source, event):
+        if event.type() == QtCore.QEvent.KeyPress:
+            if not self.roku.settings.get_keyboard_enabled():
+                return False
+            print(QKeySequence(event.key()))
+            key_str = QKeySequence(event.key()).toString()
+            if self.roku.key_listener.on_press(key_str):
+                return True
+        return super(Remote, self).eventFilter(source, event)
+
+    def closeEvent(self, event):
+        self.roku.settings.flush_to_file()
+        event.accept()
+
     def __init_settings(self):
         # print(self.roku.settings.get_keyboard_enabled())
         self.checkbox_enable_keyboard.setChecked(self.roku.settings.get_keyboard_enabled())
@@ -102,25 +124,3 @@ class Remote(QMainWindow):
         layout.addWidget(self.checkbox_enable_keyboard, 0, 1)
 
         qApp.installEventFilter(self)
-
-    def set_display_settings(self, flag):
-        self.settings_panel.show() if flag else self.settings_panel.hide()
-
-    def __create_grid_layout(self, layout):
-        w = QWidget(self)
-        self.setCentralWidget(w)
-        w.setLayout(layout)
-
-    def eventFilter(self, source, event):
-        if event.type() == QtCore.QEvent.KeyPress:
-            if not self.roku.settings.get_keyboard_enabled():
-                return False
-            print(QKeySequence(event.key()))
-            key_str = QKeySequence(event.key()).toString()
-            if self.roku.key_listener.on_press(key_str):
-                return True
-        return super(Remote, self).eventFilter(source, event)
-
-    def closeEvent(self, event):
-        self.roku.settings.flush_to_file()
-        event.accept()

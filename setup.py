@@ -7,9 +7,11 @@ Usage:
 
 from setuptools import setup
 
-APP = ['roku_main.py']
-DATA_FILES = []
-OPTIONS = {}
+APP = ['src/roku_main.py']
+DATA_FILES = ['res']
+OPTIONS = {
+    'iconfile': 'res/icon.icns',
+}
 
 setup(
     app=APP,

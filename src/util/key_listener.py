@@ -1,4 +1,5 @@
 import json
+import sys
 
 
 class KeyListener:
@@ -22,7 +23,7 @@ class KeyListener:
         if not self.roku.settings.get_keyboard_enabled():
             return False
         if btn == self.key_map["Exit"]:
-            return exit(0)
+            return sys.exit(0)
         if btn in self.key_map:
             self.roku.cmd_keypress(self.key_map[btn])
             return True
