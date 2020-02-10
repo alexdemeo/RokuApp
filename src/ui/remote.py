@@ -70,6 +70,8 @@ class Remote(QMainWindow):
         btn_showtime = QPushButton('Showtime')
         btn_youtube = QPushButton('YouTube')
         btn_computer = QPushButton('Computer')
+        btn_playstation = QPushButton('PS3')
+        btn_chromecast = QPushButton('Chromecast')
         btn_settings = QPushButton('⚙')
 
         btn_mute.clicked.connect(lambda: self.roku.cmd_keypress('VolumeMute'))
@@ -95,6 +97,8 @@ class Remote(QMainWindow):
         btn_showtime.clicked.connect(lambda: self.roku.cmd_content('8838'))
         btn_youtube.clicked.connect(lambda: self.roku.cmd_content('837'))
         btn_computer.clicked.connect(lambda: self.roku.cmd_keypress('InputHDMI3'))
+        btn_playstation.clicked.connect(lambda: self.roku.cmd_keypress('InputHDMI2'))
+        btn_chromecast.clicked.connect(lambda: self.roku.cmd_keypress('InputHDMI1'))
         btn_settings.clicked.connect(lambda: self.set_display_settings(True))
 
         layout.addWidget(btn_mute, 0, 0)
@@ -119,6 +123,8 @@ class Remote(QMainWindow):
         layout.addWidget(btn_showtime, 9, 2)
         layout.addWidget(btn_youtube, 9, 0)
         layout.addWidget(btn_computer, 10, 0)
+        layout.addWidget(btn_playstation, 10, 1)
+        layout.addWidget(btn_chromecast, 10, 2)
 
         layout.addWidget(btn_settings, 11, 1)
         layout.addWidget(self.checkbox_enable_keyboard, 0, 1)
