@@ -6,8 +6,8 @@
 
   "Select":"Return",
   "Power" : "/",
-  "Home" : "`",
-  "Back" : "Backspace",
+  "Backspace" : "Backspace",
+  "Back" : "`",
 
   "Play" : "Tab",
   "Rev" : ",",
@@ -17,5 +17,5 @@
   "VolumeUp" : "=",
   "VolumeDown" : "-",
   "VolumeMute" : "0",
-  "Esc" : "Exit"
+  "Home" : "Esc"
 }

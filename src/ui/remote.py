@@ -26,9 +26,7 @@ class Remote(QMainWindow):
         if event.type() == QtCore.QEvent.KeyPress:
             if not self.roku.settings.get_keyboard_enabled():
                 return False
-            print(QKeySequence(event.key()))
-            key_str = QKeySequence(event.key()).toString()
-            if self.roku.key_listener.on_press(key_str):
+            if self.roku.key_listener.on_press(event.key()):
                 return True
         return super(Remote, self).eventFilter(source, event)
 

@@ -26,7 +26,6 @@ class Roku:
         subprocess.Popen(command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).communicate()
 
     def cmd_keypress(self, btn):
-        print(btn)
         command = "curl -d '' http://" + self.settings.get_ip() + ":8060/keypress/" + btn
         self.__shell(command)
 
