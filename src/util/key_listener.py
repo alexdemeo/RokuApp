@@ -1,5 +1,4 @@
 import json
-import sys
 import urllib.parse
 
 from PyQt5.QtGui import QKeySequence

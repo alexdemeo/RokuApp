@@ -33,6 +33,9 @@ class Settings:
     def get_min_height(self):
         return int(self.mapping['min_height'])
 
+    def get_error_timeout(self):
+        return self.mapping['error_timeout']
+
     def set_min_height(self, min_height):
         self.mapping['min_height'] = min_height
 
