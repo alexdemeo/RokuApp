@@ -36,7 +36,7 @@ __client_id = __client_data["client_id"]
 __client_secret = __client_data["client_secret"]
 __scope = "user-read-currently-playing,user-modify-playback-state,user-read-playback-state,user-read-currently-playing"
 __redirect_uri = 'http://127.0.0.1:8888/callback'
-# cache = 'res/.spotipyoauthcache'
+__cache = 'res/spotify_auth_cache'
 
 app = Flask(__name__)
 _server_thread = None
@@ -53,11 +53,23 @@ def start_spotify_controller():
     _server_worker = Worker(app.run, '127.0.0.1', 8888)
     _server_worker.moveToThread(_server_thread)
     _server_worker.start.emit()
-    if __client_data["access_token"]:
-        global __controller
-        __controller = SpotifyController(spotipy.Spotify(__client_data["access_token"]))
+    if "refresh_token" in __client_data:
+        global __controller, __access_token
+        __access_token = __get_access_token_with_refresh(__client_data["refresh_token"])
+        __controller = SpotifyController(spotipy.Spotify(__access_token))
     else:
         __login()
+
+
+def __get_access_token_with_refresh(refresh_token):
+    params = {
+        'client_id': __client_id,
+        'client_secret': __client_secret,
+        'refresh_token': refresh_token,
+        'grant_type': 'refresh_token',
+    }
+    response = requests.post("https://accounts.spotify.com/api/token", params)
+    return json.loads(response.text)["access_token"]
 
 
 def __login():
@@ -82,13 +94,21 @@ def __spotify_callback():
         'grant_type': 'authorization_code',
     }
     response = requests.post("https://accounts.spotify.com/api/token", params)
-    data = json.loads(response.text)
-    global __access_token, __refresh_token, __controller
-    __access_token = data["access_token"]
-    __refresh_token = data["refresh_token"]
-    print("Got access token: " + __access_token + "\n\t\tfor scope: " + data["scope"])
+    __save_client_data(json.loads(response.text))
+    global __controller
     __controller = SpotifyController(spotipy.Spotify(__access_token))
     return "Login successful. Probably idk"
+
+
+def __save_client_data(data):
+    global __access_token, __refresh_token, __client_data, __clientid_file
+    __access_token = data["access_token"]
+    __refresh_token = data["refresh_token"]
+    __client_data["refresh_token"] = __refresh_token
+    print("__client_data=" + str(__client_data))
+    __clientid_file = open(CLIENT_ID, 'w')
+    json.dump(__client_data, __clientid_file, indent=4, separators=(',', ': '))
+    __clientid_file.close()
 
 
 def spotify_controller():
