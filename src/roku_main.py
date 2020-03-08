@@ -2,7 +2,6 @@ import subprocess
 import sys
 
 from PyQt5.QtWidgets import QApplication
-
 from src.ui.remote import Remote
 from src.ui.warning import show_warning
 from src.util.key_listener import KeyListener
@@ -28,7 +27,8 @@ class Roku:
                                     timeout=self.settings.get_error_timeout())
         except subprocess.TimeoutExpired:
             show_warning(self.settings, "An error occurred communicating with " + self.settings.get_ip(),
-                         "Make sure this is your Roku's IP address and that device is on the same WiFi network")
+                         "Make sure this is your Roku's IP address and that device is on the same WiFi network (or "
+                         "try again)")
 
     def cmd_keypress(self, btn):
         command = "curl -d '' http://" + self.settings.get_ip() + ":8060/keypress/" + btn

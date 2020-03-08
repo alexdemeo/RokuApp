@@ -11,6 +11,7 @@ class Settings:
         for k, v in config.items():
             self.mapping[k] = v
         print(config)
+        file.close()
 
     def get_ip(self):
         return self.mapping['ip']
@@ -46,7 +47,13 @@ class Settings:
         print('Keyboard ' + 'enabled' if flag > 0 else 'disabled')
         self.mapping['keyboard_enabled'] = True if flag > 0 else False
 
+    def get_spotify_enabled(self):
+        return self.mapping['spotify_enabled']
+
+    def set_spotify_enabled(self, enabled):
+        self.mapping['spotify_enabled'] = enabled
+
     def flush_to_file(self):
         file = open(CFG, 'w')
-        json.dump(self.mapping, file)
+        json.dump(self.mapping, file, indent=4, separators=(',', ': '))
         print('Flushed settings.json to file for contents: ' + str(self.mapping))

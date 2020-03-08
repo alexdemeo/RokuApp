@@ -1,17 +1,21 @@
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import *
-
 from src.ui.settings_panel import SettingsPanel
+import src.spotify.spotify_auth as auth
 
 
 class Remote(QMainWindow):
-
     def __init__(self, roku):
         super().__init__()
         self.roku = roku
-        self.__init_ui(roku.settings.get_title(), roku.settings.get_min_width(), roku.settings.get_min_height())
+        self.layout = QGridLayout()
+        self.__init_roku_ui(roku.settings.get_title(), roku.settings.get_min_width(), roku.settings.get_min_height())
         self.settings_panel = SettingsPanel(roku.settings)
         self.__init_settings()
+        if self.roku.settings.get_spotify_enabled():
+            print("Initializing spotify")
+            self.__init_spotify_ui()
+            auth.start_spotify_controller()
 
     def set_display_settings(self, flag):
         self.settings_panel.show() if flag else self.settings_panel.hide()
@@ -34,14 +38,36 @@ class Remote(QMainWindow):
         event.accept()
 
     def __init_settings(self):
-        # print(self.roku.settings.get_keyboard_enabled())
         self.checkbox_enable_keyboard.setChecked(self.roku.settings.get_keyboard_enabled())
 
-    def __init_ui(self, title, min_width, min_height):
+    def __init_spotify_ui(self):
+        self.layout.setRowMinimumHeight(12, 10)
+        lbl_spotify = QLabel('Spotify controls')
+        lbl_spotify.setAlignment(QtCore.Qt.AlignCenter)
+        self.layout.addWidget(lbl_spotify, 13, 1)
+
+        btn_back = QPushButton('◀')
+        btn_pause = QPushButton('॥')
+        btn_fwd = QPushButton('▶')
+        btn_shuffle = QPushButton('🔀')
+        btn_repeat = QPushButton('🔁')
+
+        btn_back.clicked.connect(lambda: auth.spotify_controller().back())
+        btn_pause.clicked.connect(lambda: auth.spotify_controller().pause())
+        btn_fwd.clicked.connect(lambda: auth.spotify_controller().fwd())
+        btn_shuffle.clicked.connect(lambda: auth.spotify_controller().shuffle())
+        btn_repeat.clicked.connect(lambda: auth.spotify_controller().repeat())
+
+        self.layout.addWidget(btn_back, 14, 0)
+        self.layout.addWidget(btn_pause, 14, 1)
+        self.layout.addWidget(btn_fwd, 14, 2)
+        self.layout.addWidget(btn_shuffle, 15, 0)
+        self.layout.addWidget(btn_repeat, 15, 2)
+
+    def __init_roku_ui(self, title, min_width, min_height):
         self.setMinimumSize(min_width, min_height)
         self.setWindowTitle(title)
-        layout = QGridLayout()
-        self.__create_grid_layout(layout)
+        self.__create_grid_layout(self.layout)
         self.checkbox_enable_keyboard = QCheckBox('Enable keyboard')
         self.checkbox_enable_keyboard.stateChanged.connect(lambda x: self.roku.settings.set_keyboard_enabled(x))
 
@@ -98,32 +124,35 @@ class Remote(QMainWindow):
         btn_chromecast.clicked.connect(lambda: self.roku.cmd_keypress('InputHDMI1'))
         btn_settings.clicked.connect(lambda: self.set_display_settings(True))
 
-        layout.addWidget(btn_mute, 0, 0)
-        layout.addWidget(btn_pwr, 0, 2)
-        layout.addWidget(btn_vol_down, 1, 0)
-        layout.addWidget(btn_vol_up, 1, 2)
-        layout.addWidget(btn_back, 2, 0)
-        layout.addWidget(btn_home, 2, 2)
-        layout.addWidget(btn_arrow_up, 3, 1)
-        layout.addWidget(btn_arrow_down, 5, 1)
-        layout.addWidget(btn_arrow_left, 4, 0)
-        layout.addWidget(btn_arrow_right, 4, 2)
-        layout.addWidget(btn_ok, 4, 1)
-        layout.addWidget(btn_replay, 6, 0)
-        layout.addWidget(btn_no_disturb, 6, 1)
-        layout.addWidget(btn_details, 6, 2)
-        layout.addWidget(btn_rew, 7, 0)
-        layout.addWidget(btn_play_pause, 7, 1)
-        layout.addWidget(btn_fwd, 7, 2)
-        layout.addWidget(btn_netflix, 8, 0)
-        layout.addWidget(btn_hulu, 8, 2)
-        layout.addWidget(btn_showtime, 9, 2)
-        layout.addWidget(btn_youtube, 9, 0)
-        layout.addWidget(btn_computer, 10, 0)
-        layout.addWidget(btn_playstation, 10, 1)
-        layout.addWidget(btn_chromecast, 10, 2)
-
-        layout.addWidget(btn_settings, 11, 1)
-        layout.addWidget(self.checkbox_enable_keyboard, 0, 1)
+        self.layout.addWidget(btn_mute, 0, 0)
+        self.layout.addWidget(btn_pwr, 0, 2)
+        self.layout.addWidget(btn_vol_down, 1, 0)
+        self.layout.addWidget(btn_vol_up, 1, 2)
+        self.layout.addWidget(btn_back, 2, 0)
+        self.layout.addWidget(btn_home, 2, 2)
+        self.layout.addWidget(btn_arrow_up, 3, 1)
+        self.layout.addWidget(btn_arrow_down, 5, 1)
+        self.layout.addWidget(btn_arrow_left, 4, 0)
+        self.layout.addWidget(btn_arrow_right, 4, 2)
+        self.layout.addWidget(btn_ok, 4, 1)
+        self.layout.addWidget(btn_replay, 6, 0)
+        self.layout.addWidget(btn_no_disturb, 6, 1)
+        self.layout.addWidget(btn_details, 6, 2)
+        self.layout.addWidget(btn_rew, 7, 0)
+        self.layout.addWidget(btn_play_pause, 7, 1)
+        self.layout.addWidget(btn_fwd, 7, 2)
+        self.layout.addWidget(btn_netflix, 8, 0)
+        self.layout.addWidget(btn_hulu, 8, 2)
+        self.layout.addWidget(btn_showtime, 9, 2)
+        self.layout.addWidget(btn_youtube, 9, 0)
+        self.layout.addWidget(btn_computer, 10, 0)
+        self.layout.addWidget(btn_playstation, 10, 1)
+        self.layout.addWidget(btn_chromecast, 10, 2)
+        self.layout.addWidget(btn_settings, 11, 1)
+        self.layout.addWidget(self.checkbox_enable_keyboard, 0, 1)
 
         qApp.installEventFilter(self)
+
+    def focus(self):
+        self.setWindowState(self.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
+        self.activateWindow()
