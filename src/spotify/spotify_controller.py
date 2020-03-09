@@ -1,7 +1,20 @@
 import spotipy
 
 
+def __current_track_info(current_playback):
+    item = current_playback["item"]
+    artists = []
+    for a in item["artists"]:
+        artists.append(a["name"])
+    return item["name"], ', '.join(artists)
+
+
 class SpotifyController:
+    """
+    self.is_playing:
+        True -> ▶
+        False -> ॥
+    """
     def __init__(self, spotify):
         # type: (spotipy.Spotify) -> None
         self.spotify = spotify
@@ -19,6 +32,7 @@ class SpotifyController:
             self.spotify.start_playback()
         else:
             self.spotify.pause_playback()
+        return self.is_playing
 
     def back(self):
         self.spotify.previous_track()
@@ -34,7 +48,7 @@ class SpotifyController:
         self.spotify.repeat("context")
 
     def set_volume(self, volume):
-        pass
+        self.spotify.volume(volume)
 
     def get_current_track(self):
         pass

@@ -46,23 +46,38 @@ class Remote(QMainWindow):
         lbl_spotify.setAlignment(QtCore.Qt.AlignCenter)
         self.layout.addWidget(lbl_spotify, 13, 1)
 
+        lbl_current_track = QLabel('No current playing track')
+        lbl_current_track.setAlignment(QtCore.Qt.AlignCenter)
+        self.layout.addWidget(lbl_current_track, 14, 0, 1, 3)
+
         btn_back = QPushButton('◀')
         btn_pause = QPushButton('॥')
         btn_fwd = QPushButton('▶')
         btn_shuffle = QPushButton('🔀')
         btn_repeat = QPushButton('🔁')
 
+        def pause():
+            paused = auth.spotify_controller().pause()
+            btn_pause.setText('॥' if paused else '▶')
+
         btn_back.clicked.connect(lambda: auth.spotify_controller().back())
-        btn_pause.clicked.connect(lambda: auth.spotify_controller().pause())
+        btn_pause.clicked.connect(pause)
+
         btn_fwd.clicked.connect(lambda: auth.spotify_controller().fwd())
         btn_shuffle.clicked.connect(lambda: auth.spotify_controller().shuffle())
         btn_repeat.clicked.connect(lambda: auth.spotify_controller().repeat())
 
-        self.layout.addWidget(btn_back, 14, 0)
-        self.layout.addWidget(btn_pause, 14, 1)
-        self.layout.addWidget(btn_fwd, 14, 2)
-        self.layout.addWidget(btn_shuffle, 15, 0)
-        self.layout.addWidget(btn_repeat, 15, 2)
+        self.layout.addWidget(btn_back, 15, 0)
+        self.layout.addWidget(btn_pause, 15, 1)
+        self.layout.addWidget(btn_fwd, 15, 2)
+        self.layout.addWidget(btn_shuffle, 16, 0)
+        self.layout.addWidget(btn_repeat, 16, 2)
+
+        slide_volume = QSlider(QtCore.Qt.Horizontal)
+        slide_volume.setMinimum(0)
+        slide_volume.setMaximum(100)
+        slide_volume.valueChanged.connect(lambda v: auth.spotify_controller().set_volume(v))
+        self.layout.addWidget(slide_volume, 17, 0, 1, 3)
 
     def __init_roku_ui(self, title, min_width, min_height):
         self.setMinimumSize(min_width, min_height)
