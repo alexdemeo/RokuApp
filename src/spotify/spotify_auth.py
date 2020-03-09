@@ -47,17 +47,17 @@ __controller = None
 
 
 def start_spotify_controller():
-    global _server_thread, _server_worker
-    _server_thread = QThread()  # fork login server redirect thread
-    _server_thread.start()
-    _server_worker = Worker(app.run, '127.0.0.1', 8888)
-    _server_worker.moveToThread(_server_thread)
-    _server_worker.start.emit()
     if "refresh_token" in __client_data:
         global __controller, __access_token
         __access_token = __get_access_token_with_refresh(__client_data["refresh_token"])
         __controller = SpotifyController(spotipy.Spotify(__access_token))
     else:
+        global _server_thread, _server_worker
+        _server_thread = QThread()  # fork login server redirect thread
+        _server_thread.start()
+        _server_worker = Worker(app.run, '127.0.0.1', 8888)
+        _server_worker.moveToThread(_server_thread)
+        _server_worker.start.emit()
         __login()
 
 
@@ -85,6 +85,8 @@ def __login():
 @app.route("/callback", methods=["POST", "GET"])
 def __spotify_callback():
     code = request.args.get('code')
+    if not code:
+        return
     print("Got auth code: " + code)
     params = {
         'client_id': __client_id,
@@ -97,6 +99,7 @@ def __spotify_callback():
     __save_client_data(json.loads(response.text))
     global __controller
     __controller = SpotifyController(spotipy.Spotify(__access_token))
+    _server_thread.wait()  # unsure of this, should kill flask server once authenticated
     return "Login successful. Probably idk"
 
 
