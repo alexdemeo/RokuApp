@@ -3,19 +3,22 @@ import spotipy
 
 class SpotifyController:
     def __init__(self, spotify):
-        self.spotify = spotify  # type: spotipy.Spotify
+        # type: (spotipy.Spotify) -> None
+        self.spotify = spotify
         current_playback = self.spotify.current_playback()
-        self.is_playing = current_playback["is_playing"]
-        self.shuffle_state = current_playback["shuffle_state"]
-        self.repeat_state = current_playback["repeat_state"]
-        print(str(self.is_playing) + " " + str(self.shuffle_state) + " " + str(self.repeat_state))
+        if current_playback is not None:
+            self.is_playing = current_playback["is_playing"]
+            self.shuffle_state = current_playback["shuffle_state"]
+            self.repeat_state = current_playback["repeat_state"]
+        else:
+            print("current_playback was null")
 
     def pause(self):
-        if self.is_playing:
-            self.spotify.pause_playback()
-        else:
-            self.spotify.start_playback()
         self.is_playing = not self.is_playing
+        if self.is_playing:
+            self.spotify.start_playback()
+        else:
+            self.spotify.pause_playback()
 
     def back(self):
         self.spotify.previous_track()
