@@ -5,7 +5,19 @@ from typing import Callable
 import spotipy
 
 # Updated currently playing even 10 seconds
+from src.ui.warning import show_warning
+
 REFRESH_DATA_INTERVAL = 10
+
+
+def catch_spotify_exception(f):
+    def decorated_function(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except spotipy.SpotifyException as se:
+            show_warning(str(se.http_status), se.msg)
+
+    return decorated_function
 
 
 class SpotifyController:
@@ -29,6 +41,7 @@ class SpotifyController:
         time.sleep(REFRESH_DATA_INTERVAL)
         self.__tick()
 
+    @catch_spotify_exception
     def pause(self):
         if self.is_playing:
             self.spotify.pause_playback()
@@ -36,6 +49,7 @@ class SpotifyController:
             self.spotify.start_playback()
         self.is_playing = not self.is_playing
 
+    @catch_spotify_exception
     def back(self):
         self.spotify.previous_track()
         # this doesn't help currently, since it refreshes before
@@ -43,27 +57,31 @@ class SpotifyController:
         # or something
         self.refresh_current_playback()
 
+    @catch_spotify_exception
     def fwd(self):
         self.spotify.next_track()
         # same issue as above in self.back()
         self.refresh_current_playback()
 
+    @catch_spotify_exception
     def shuffle(self):
         self.shuffle_state = not self.shuffle_state
         self.spotify.shuffle(self.shuffle_state)
 
+    @catch_spotify_exception
     def repeat(self):
         self.spotify.repeat("context")
 
+    @catch_spotify_exception
     def set_volume(self, volume):
         self.spotify.volume(volume)
 
     def get_volume(self):
-        return self.volume
+        return self.volume or 25
 
     def get_current_track(self):
         res = self.__current_track_info()
-        return res[0] + ": " + res[1]
+        return res[0] + ": " + res[1] if res else "No current playback data"
 
     def get_paused(self):
         return not self.is_playing
@@ -77,12 +95,16 @@ class SpotifyController:
         pass
 
     def __current_track_info(self):
-        item = self.current_playback["item"]
-        artists = []
-        for a in item["artists"]:
-            artists.append(a["name"])
-        return item["name"], ', '.join(artists)
+        if not self.current_playback:
+            return None
+        else:
+            item = self.current_playback["item"]
+            artists = []
+            for a in item["artists"]:
+                artists.append(a["name"])
+            return item["name"], ', '.join(artists)
 
+    @catch_spotify_exception
     def refresh_current_playback(self):
         self.current_playback = self.spotify.current_playback()
         if self.current_playback is not None:

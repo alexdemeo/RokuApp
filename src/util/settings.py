@@ -52,7 +52,7 @@ class Settings:
 
     def set_spotify_enabled(self, flag):
         # type: (bool) -> None
-        self.mapping['keyboard_enabled'] = flag
+        self.mapping['spotify_enabled'] = flag
 
     def flush_to_file(self):
         file = open(CFG, 'w')

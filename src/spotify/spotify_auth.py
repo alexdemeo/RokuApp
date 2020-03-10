@@ -118,5 +118,5 @@ def __save_client_data(data):
 def spotify_controller():
     #  type: () -> Optional[SpotifyController]
     if not __controller:
-        show_warning("No authenticated for some reasoning")
+        show_warning("Not authenticated for some reasoning", "SpotifyController doesn't exist")
     return __controller

@@ -26,9 +26,9 @@ class Roku:
             subprocess.check_output(command.split(), stderr=subprocess.DEVNULL,
                                     timeout=self.settings.get_error_timeout())
         except subprocess.TimeoutExpired:
-            show_warning(self.settings, "An error occurred communicating with " + self.settings.get_ip(),
+            show_warning("An error occurred communicating with " + self.settings.get_ip(),
                          "Make sure this is your Roku's IP address and that device is on the same WiFi network (or "
-                         "try again)")
+                         "try again)", self.settings)
 
     def cmd_keypress(self, btn):
         command = "curl -d '' http://" + self.settings.get_ip() + ":8060/keypress/" + btn
