@@ -13,14 +13,14 @@ class KeyListener:
         # print("Key mappings are:")
 
         self.key_map["Space"] = 'Lit_%20'
-        for key in self.key_map:
-            print("\t" + key + " –> " + self.key_map[key])
+        # for key in self.key_map:
+        #     print("\t" + key + " –> " + self.key_map[key])
 
         self.ascii_map = dict()
         for e in [x for x in range(0, 255)]:  # A to z
             self.ascii_map[e] = "Lit_" + urllib.parse.quote(chr(e))
             # print("\t" + str(e) + " –> " + "Lit_" + urllib.parse.quote(chr(e)))
-        print()
+        # print()
 
     def on_press(self, btn):
         btn_str = QKeySequence(btn).toString()

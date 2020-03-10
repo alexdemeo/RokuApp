@@ -14,8 +14,8 @@ class Remote(QMainWindow):
         self.__init_settings()
         if self.roku.settings.get_spotify_enabled():
             print("Initializing spotify")
+            auth.start_spotify_controller(self.__on_spotify_controller_tick)
             self.__init_spotify_ui()
-            auth.start_spotify_controller()
 
     def set_display_settings(self, flag):
         self.settings_panel.show() if flag else self.settings_panel.hide()
@@ -44,11 +44,11 @@ class Remote(QMainWindow):
         self.layout.setRowMinimumHeight(12, 10)
         lbl_spotify = QLabel('Spotify controls')
         lbl_spotify.setAlignment(QtCore.Qt.AlignCenter)
-        self.layout.addWidget(lbl_spotify, 13, 1)
+        self.layout.addWidget(lbl_spotify, 12, 1)
 
-        lbl_current_track = QLabel('No current playing track')
-        lbl_current_track.setAlignment(QtCore.Qt.AlignCenter)
-        self.layout.addWidget(lbl_current_track, 14, 0, 1, 3)
+        self.lbl_current_track = QLabel('No current playing track')
+        self.lbl_current_track.setAlignment(QtCore.Qt.AlignCenter)
+        self.layout.addWidget(self.lbl_current_track, 13, 0, 1, 3)
 
         btn_back = QPushButton('◀')
         btn_pause = QPushButton('॥')
@@ -67,17 +67,21 @@ class Remote(QMainWindow):
         btn_shuffle.clicked.connect(lambda: auth.spotify_controller().shuffle())
         btn_repeat.clicked.connect(lambda: auth.spotify_controller().repeat())
 
-        self.layout.addWidget(btn_back, 15, 0)
-        self.layout.addWidget(btn_pause, 15, 1)
-        self.layout.addWidget(btn_fwd, 15, 2)
-        self.layout.addWidget(btn_shuffle, 16, 0)
-        self.layout.addWidget(btn_repeat, 16, 2)
+        self.layout.addWidget(btn_back, 14, 0)
+        self.layout.addWidget(btn_pause, 14, 1)
+        self.layout.addWidget(btn_fwd, 14, 2)
+        self.layout.addWidget(btn_shuffle, 15, 0)
+        self.layout.addWidget(btn_repeat, 15, 2)
 
         slide_volume = QSlider(QtCore.Qt.Horizontal)
         slide_volume.setMinimum(0)
         slide_volume.setMaximum(100)
+        slide_volume.setValue(auth.spotify_controller().get_volume())
         slide_volume.valueChanged.connect(lambda v: auth.spotify_controller().set_volume(v))
-        self.layout.addWidget(slide_volume, 17, 0, 1, 3)
+        self.layout.addWidget(slide_volume, 16, 0, 1, 3)
+
+    def __on_spotify_controller_tick(self):
+        self.lbl_current_track.setText(auth.spotify_controller().get_current_track())
 
     def __init_roku_ui(self, title, min_width, min_height):
         self.setMinimumSize(min_width, min_height)
@@ -110,7 +114,6 @@ class Remote(QMainWindow):
         btn_computer = QPushButton('Computer')
         btn_playstation = QPushButton('PS3')
         btn_chromecast = QPushButton('Chromecast')
-        btn_settings = QPushButton('⚙')
 
         btn_mute.clicked.connect(lambda: self.roku.cmd_keypress('VolumeMute'))
         btn_pwr.clicked.connect(lambda: self.roku.cmd_keypress('Power'))
@@ -137,7 +140,6 @@ class Remote(QMainWindow):
         btn_computer.clicked.connect(lambda: self.roku.cmd_keypress('InputHDMI3'))
         btn_playstation.clicked.connect(lambda: self.roku.cmd_keypress('InputHDMI2'))
         btn_chromecast.clicked.connect(lambda: self.roku.cmd_keypress('InputHDMI1'))
-        btn_settings.clicked.connect(lambda: self.set_display_settings(True))
 
         self.layout.addWidget(btn_mute, 0, 0)
         self.layout.addWidget(btn_pwr, 0, 2)
@@ -163,8 +165,11 @@ class Remote(QMainWindow):
         self.layout.addWidget(btn_computer, 10, 0)
         self.layout.addWidget(btn_playstation, 10, 1)
         self.layout.addWidget(btn_chromecast, 10, 2)
-        self.layout.addWidget(btn_settings, 11, 1)
         self.layout.addWidget(self.checkbox_enable_keyboard, 0, 1)
+
+        btn_settings = QPushButton('⚙')
+        btn_settings.clicked.connect(lambda: self.set_display_settings(True))
+        self.layout.addWidget(btn_settings, 17, 1)
 
         qApp.installEventFilter(self)
 

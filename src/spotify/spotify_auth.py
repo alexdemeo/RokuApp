@@ -1,5 +1,6 @@
 import json
 import webbrowser
+from typing import Optional
 from urllib.parse import urlencode
 
 import requests
@@ -46,11 +47,11 @@ __refresh_token = None
 __controller = None
 
 
-def start_spotify_controller():
+def start_spotify_controller(on_controller_tick):
     if "refresh_token" in __client_data:
         global __controller, __access_token
         __access_token = __get_access_token_with_refresh(__client_data["refresh_token"])
-        __controller = SpotifyController(spotipy.Spotify(__access_token))
+        __controller = SpotifyController(spotipy.Spotify(__access_token), on_controller_tick)
     else:
         global _server_thread, _server_worker
         _server_thread = QThread()  # fork login server redirect thread
@@ -115,6 +116,7 @@ def __save_client_data(data):
 
 
 def spotify_controller():
+    #  type: () -> Optional[SpotifyController]
     if not __controller:
         show_warning("No authenticated for some reasoning")
     return __controller
