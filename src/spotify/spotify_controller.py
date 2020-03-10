@@ -7,6 +7,7 @@ import spotipy
 # Updated currently playing even 10 seconds
 REFRESH_DATA_INTERVAL = 10
 
+
 class SpotifyController:
     def __init__(self, spotify, on_controller_tick):
         # type: (spotipy.Spotify, Callable) -> None
@@ -22,25 +23,30 @@ class SpotifyController:
         _thread.start_new_thread(self.__tick, ())
 
     def __tick(self):
-        # do things, call the call back, then sleep and repeat
+        # refresh the current playback, which will call on_controller_tick,
+        # then sleep and repeat
         self.refresh_current_playback()
-        self.on_controller_tick()
         time.sleep(REFRESH_DATA_INTERVAL)
         self.__tick()
 
     def pause(self):
-        self.is_playing = not self.is_playing
         if self.is_playing:
-            self.spotify.start_playback()
-        else:
             self.spotify.pause_playback()
-        return self.is_playing
+        else:
+            self.spotify.start_playback()
+        self.is_playing = not self.is_playing
 
     def back(self):
         self.spotify.previous_track()
+        # this doesn't help currently, since it refreshes before
+        # the call to previous track finishes. Needs a timeout
+        # or something
+        self.refresh_current_playback()
 
     def fwd(self):
         self.spotify.next_track()
+        # same issue as above in self.back()
+        self.refresh_current_playback()
 
     def shuffle(self):
         self.shuffle_state = not self.shuffle_state
@@ -59,6 +65,9 @@ class SpotifyController:
         res = self.__current_track_info()
         return res[0] + ": " + res[1]
 
+    def get_paused(self):
+        return not self.is_playing
+
     def __current_track_info(self):
         item = self.current_playback["item"]
         artists = []
@@ -75,3 +84,4 @@ class SpotifyController:
             self.volume = self.current_playback["device"]["volume_percent"]
         else:
             print("current_playback was null")
+        self.on_controller_tick()

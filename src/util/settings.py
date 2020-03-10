@@ -1,5 +1,7 @@
 import json
 
+from PyQt5.QtCore import Qt
+
 CFG = 'res/settings.json'
 
 
@@ -44,14 +46,15 @@ class Settings:
         return self.mapping['keyboard_enabled']
 
     def set_keyboard_enabled(self, flag):
-        print('Keyboard ' + 'enabled' if flag > 0 else 'disabled')
-        self.mapping['keyboard_enabled'] = True if flag > 0 else False
+        # type: (bool) -> None
+        self.mapping['keyboard_enabled'] = flag
 
     def get_spotify_enabled(self):
         return self.mapping['spotify_enabled']
 
-    def set_spotify_enabled(self, enabled):
-        self.mapping['spotify_enabled'] = enabled
+    def set_spotify_enabled(self, flag):
+        # type: (bool) -> None
+        self.mapping['keyboard_enabled'] = flag
 
     def flush_to_file(self):
         file = open(CFG, 'w')

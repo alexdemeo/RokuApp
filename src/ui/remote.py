@@ -6,12 +6,11 @@ import src.spotify.spotify_auth as auth
 
 class Remote(QMainWindow):
     def __init__(self, roku):
-        super().__init__()
+        super().__init__(flags=QtCore.Qt.WindowTitleHint)
         self.roku = roku
         self.layout = QGridLayout()
         self.__init_roku_ui(roku.settings.get_title(), roku.settings.get_min_width(), roku.settings.get_min_height())
         self.settings_panel = SettingsPanel(roku.settings)
-        self.__init_settings()
         if self.roku.settings.get_spotify_enabled():
             print("Initializing spotify")
             auth.start_spotify_controller(self.__on_spotify_controller_tick)
@@ -37,12 +36,9 @@ class Remote(QMainWindow):
         self.roku.settings.flush_to_file()
         event.accept()
 
-    def __init_settings(self):
-        self.checkbox_enable_keyboard.setChecked(self.roku.settings.get_keyboard_enabled())
-
     def __init_spotify_ui(self):
         self.layout.setRowMinimumHeight(12, 10)
-        lbl_spotify = QLabel('Spotify controls')
+        lbl_spotify = QLabel('')  # said Spotify controls, currently just a spacer
         lbl_spotify.setAlignment(QtCore.Qt.AlignCenter)
         self.layout.addWidget(lbl_spotify, 12, 1)
 
@@ -50,15 +46,18 @@ class Remote(QMainWindow):
         self.lbl_current_track.setAlignment(QtCore.Qt.AlignCenter)
         self.layout.addWidget(self.lbl_current_track, 13, 0, 1, 3)
 
+        def pause_symbol():
+            return '॥' if not auth.spotify_controller().get_paused() else '▶'
+
         btn_back = QPushButton('◀')
-        btn_pause = QPushButton('॥')
+        btn_pause = QPushButton(pause_symbol())
         btn_fwd = QPushButton('▶')
         btn_shuffle = QPushButton('🔀')
         btn_repeat = QPushButton('🔁')
 
         def pause():
-            paused = auth.spotify_controller().pause()
-            btn_pause.setText('॥' if paused else '▶')
+            auth.spotify_controller().pause()
+            btn_pause.setText(pause_symbol())
 
         btn_back.clicked.connect(lambda: auth.spotify_controller().back())
         btn_pause.clicked.connect(pause)
@@ -81,14 +80,16 @@ class Remote(QMainWindow):
         self.layout.addWidget(slide_volume, 16, 0, 1, 3)
 
     def __on_spotify_controller_tick(self):
-        self.lbl_current_track.setText(auth.spotify_controller().get_current_track())
+        try:
+            self.lbl_current_track.setText(auth.spotify_controller().get_current_track())
+        except AttributeError:
+            # this happens on started before the UI is build, which is fine
+            pass
 
     def __init_roku_ui(self, title, min_width, min_height):
         self.setMinimumSize(min_width, min_height)
         self.setWindowTitle(title)
         self.__create_grid_layout(self.layout)
-        self.checkbox_enable_keyboard = QCheckBox('Enable keyboard')
-        self.checkbox_enable_keyboard.stateChanged.connect(lambda x: self.roku.settings.set_keyboard_enabled(x))
 
         btn_mute = QPushButton('🔇')
         btn_pwr = QPushButton('🔌')
@@ -165,7 +166,6 @@ class Remote(QMainWindow):
         self.layout.addWidget(btn_computer, 10, 0)
         self.layout.addWidget(btn_playstation, 10, 1)
         self.layout.addWidget(btn_chromecast, 10, 2)
-        self.layout.addWidget(self.checkbox_enable_keyboard, 0, 1)
 
         btn_settings = QPushButton('⚙')
         btn_settings.clicked.connect(lambda: self.set_display_settings(True))
