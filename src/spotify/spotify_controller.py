@@ -68,6 +68,14 @@ class SpotifyController:
     def get_paused(self):
         return not self.is_playing
 
+    def get_currented_track_liked(self):
+        # not yet implemented
+        return False
+
+    def set_currented_track_liked(self, flag):
+        # not yet implemented
+        pass
+
     def __current_track_info(self):
         item = self.current_playback["item"]
         artists = []

@@ -1,4 +1,5 @@
 from PyQt5 import QtCore
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 from src.ui.settings_panel import SettingsPanel
 import src.spotify.spotify_auth as auth
@@ -49,28 +50,37 @@ class Remote(QMainWindow):
         def pause_symbol():
             return '॥' if not auth.spotify_controller().get_paused() else '▶'
 
+        def like_symbol():
+            return '♥' if auth.spotify_controller().get_currented_track_liked() else '♡'
+
         btn_back = QPushButton('◀')
         btn_pause = QPushButton(pause_symbol())
         btn_fwd = QPushButton('▶')
         btn_shuffle = QPushButton('🔀')
         btn_repeat = QPushButton('🔁')
+        checkbox_like = QCheckBox(like_symbol())
 
         def pause():
             auth.spotify_controller().pause()
             btn_pause.setText(pause_symbol())
 
+        def like(flag):
+            auth.spotify_controller().set_currented_track_liked(flag)
+            checkbox_like.setText(like_symbol())
+
         btn_back.clicked.connect(lambda: auth.spotify_controller().back())
         btn_pause.clicked.connect(pause)
-
         btn_fwd.clicked.connect(lambda: auth.spotify_controller().fwd())
         btn_shuffle.clicked.connect(lambda: auth.spotify_controller().shuffle())
         btn_repeat.clicked.connect(lambda: auth.spotify_controller().repeat())
+        checkbox_like.stateChanged.connect(lambda checked: like(checked == QtCore.Qt.Checked))
 
         self.layout.addWidget(btn_back, 14, 0)
         self.layout.addWidget(btn_pause, 14, 1)
         self.layout.addWidget(btn_fwd, 14, 2)
         self.layout.addWidget(btn_shuffle, 15, 0)
         self.layout.addWidget(btn_repeat, 15, 2)
+        # self.layout.addWidget(checkbox_like, 15, 1)
 
         slide_volume = QSlider(QtCore.Qt.Horizontal)
         slide_volume.setMinimum(0)

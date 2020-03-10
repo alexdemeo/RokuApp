@@ -22,7 +22,7 @@ class SettingsPanel(QWidget):
         lbl_enable_keyboard = QLabel('Keyboard enabled:')
         checkbox_enable_keyboard = QCheckBox()
 
-        lbl_spotify = QLabel('Spotify enabled: ')
+        lbl_spotify = QLabel('Spotify controller enabled: ')
         checkbox_spotify = QCheckBox()
 
         text_ip.setText(self.settings.get_ip())

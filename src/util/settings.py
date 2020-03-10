@@ -1,7 +1,5 @@
 import json
 
-from PyQt5.QtCore import Qt
-
 CFG = 'res/settings.json'
 
 
