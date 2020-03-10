@@ -20,3 +20,4 @@ later but there's some latency there
 * Spotify usage is basically forced right now, it will eventually be configurable in settings so that on launch the Spotify authentication isn't forced on the user\n
 * Disabling spotify controller in settings requires relaunching app for change to take effect
 
+With the Roku Spotify app, Spotify functionality isn't all that useful. Oh well.
