@@ -77,7 +77,7 @@ class SpotifyController:
         self.spotify.volume(volume)
 
     def get_volume(self):
-        return self.volume or 25
+        return self.volume or 0
 
     def get_current_track(self):
         res = self.__current_track_info()
