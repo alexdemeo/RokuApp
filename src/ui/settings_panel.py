@@ -22,9 +22,6 @@ class SettingsPanel(QWidget):
         lbl_enable_keyboard = QLabel('Keyboard enabled:')
         checkbox_enable_keyboard = QCheckBox()
 
-        lbl_spotify = QLabel('Spotify controller enabled: ')
-        checkbox_spotify = QCheckBox()
-
         text_ip.setText(self.settings.get_ip())
         text_ip.textChanged.connect(self.text_ip_edit_done)
 
@@ -32,18 +29,11 @@ class SettingsPanel(QWidget):
         checkbox_enable_keyboard.stateChanged.connect(
             lambda checked: self.settings.set_keyboard_enabled(checked == QtCore.Qt.Checked))
 
-        checkbox_spotify.setChecked(self.settings.get_spotify_enabled())
-        checkbox_spotify.stateChanged.connect(
-            lambda checked: self.settings.set_spotify_enabled(checked == QtCore.Qt.Checked))
-
         layout.addWidget(lbl_ip, 0, 0)
         layout.addWidget(text_ip, 0, 1)
 
         layout.addWidget(lbl_enable_keyboard, 1, 0)
         layout.addWidget(checkbox_enable_keyboard, 1, 1)
-
-        layout.addWidget(lbl_spotify, 2, 0)
-        layout.addWidget(checkbox_spotify, 2, 1)
 
         btn_done = QPushButton('Done')
         btn_done.clicked.connect(self.close_panel)

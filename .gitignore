@@ -4,5 +4,3 @@ res/.DS_Store
 
 build
 dist
-
-res/client_id.json

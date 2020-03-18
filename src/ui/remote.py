@@ -2,7 +2,6 @@ from PyQt5 import QtCore
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 from src.ui.settings_panel import SettingsPanel
-import src.spotify.spotify_auth as auth
 
 
 class Remote(QMainWindow):
@@ -12,10 +11,6 @@ class Remote(QMainWindow):
         self.layout = QGridLayout()
         self.__init_roku_ui(roku.settings.get_title(), roku.settings.get_min_width(), roku.settings.get_min_height())
         self.settings_panel = SettingsPanel(roku.settings)
-        if self.roku.settings.get_spotify_enabled():
-            print("Initializing spotify")
-            auth.start_spotify_controller(self.__on_spotify_controller_tick)
-            self.__init_spotify_ui()
 
     def set_display_settings(self, flag):
         self.settings_panel.show() if flag else self.settings_panel.hide()
@@ -36,65 +31,6 @@ class Remote(QMainWindow):
     def closeEvent(self, event):
         self.roku.settings.flush_to_file()
         event.accept()
-
-    def __init_spotify_ui(self):
-        self.layout.setRowMinimumHeight(12, 10)
-        lbl_spotify = QLabel('')  # said Spotify controls, currently just a spacer
-        lbl_spotify.setAlignment(QtCore.Qt.AlignCenter)
-        self.layout.addWidget(lbl_spotify, 12, 1)
-
-        self.lbl_current_track = QLabel('No current playing track')
-        self.lbl_current_track.setAlignment(QtCore.Qt.AlignCenter)
-        self.layout.addWidget(self.lbl_current_track, 13, 0, 1, 3)
-
-        def pause_symbol():
-            return '॥' if not auth.spotify_controller().get_paused() else '▶'
-
-        def like_symbol():
-            return '♥' if auth.spotify_controller().get_currented_track_liked() else '♡'
-
-        btn_back = QPushButton('◀')
-        btn_pause = QPushButton(pause_symbol())
-        btn_fwd = QPushButton('▶')
-        btn_shuffle = QPushButton('🔀')
-        btn_repeat = QPushButton('🔁')
-        checkbox_like = QCheckBox(like_symbol())
-
-        def pause():
-            auth.spotify_controller().pause()
-            btn_pause.setText(pause_symbol())
-
-        def like(flag):
-            auth.spotify_controller().set_currented_track_liked(flag)
-            checkbox_like.setText(like_symbol())
-
-        btn_back.clicked.connect(lambda: auth.spotify_controller().back())
-        btn_pause.clicked.connect(pause)
-        btn_fwd.clicked.connect(lambda: auth.spotify_controller().fwd())
-        btn_shuffle.clicked.connect(lambda: auth.spotify_controller().shuffle())
-        btn_repeat.clicked.connect(lambda: auth.spotify_controller().repeat())
-        checkbox_like.stateChanged.connect(lambda checked: like(checked == QtCore.Qt.Checked))
-
-        self.layout.addWidget(btn_back, 14, 0)
-        self.layout.addWidget(btn_pause, 14, 1)
-        self.layout.addWidget(btn_fwd, 14, 2)
-        self.layout.addWidget(btn_shuffle, 15, 0)
-        self.layout.addWidget(btn_repeat, 15, 2)
-        # self.layout.addWidget(checkbox_like, 15, 1)
-
-        slide_volume = QSlider(QtCore.Qt.Horizontal)
-        slide_volume.setMinimum(0)
-        slide_volume.setMaximum(100)
-        slide_volume.setValue(auth.spotify_controller().get_volume())
-        slide_volume.valueChanged.connect(lambda v: auth.spotify_controller().set_volume(v))
-        self.layout.addWidget(slide_volume, 16, 0, 1, 3)
-
-    def __on_spotify_controller_tick(self):
-        try:
-            self.lbl_current_track.setText(auth.spotify_controller().get_current_track())
-        except AttributeError:
-            # this happens on started before the UI is build, which is fine
-            pass
 
     def __init_roku_ui(self, title, min_width, min_height):
         self.setMinimumSize(min_width, min_height)

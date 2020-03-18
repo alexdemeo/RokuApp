@@ -4,6 +4,5 @@
     "ip": "192.168.10.219",
     "error_timeout": 10,
     "min_width": 0,
-    "min_height": 0,
-    "spotify_enabled": false
+    "min_height": 0
 }

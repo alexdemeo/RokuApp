@@ -47,13 +47,6 @@ class Settings:
         # type: (bool) -> None
         self.mapping['keyboard_enabled'] = flag
 
-    def get_spotify_enabled(self):
-        return self.mapping['spotify_enabled']
-
-    def set_spotify_enabled(self, flag):
-        # type: (bool) -> None
-        self.mapping['spotify_enabled'] = flag
-
     def flush_to_file(self):
         file = open(CFG, 'w')
         json.dump(self.mapping, file, indent=4, separators=(',', ': '))
