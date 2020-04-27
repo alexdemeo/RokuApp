@@ -13,6 +13,12 @@ class Settings:
         print(config)
         file.close()
 
+    def get_volume_interval(self):
+        return self.mapping['volume_interval']
+
+    def set_volume_interval(self, interval):
+        self.mapping['volume_interval'] = interval;
+
     def get_ip(self):
         return self.mapping['ip']
 
